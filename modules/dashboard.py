@@ -1,5 +1,5 @@
 import streamlit as st
-
+import pandas as pd
 from services.dashboard_service import DashboardService
 from services.filter_service import FilterService
 from services.chart_service import ChartService
@@ -326,27 +326,17 @@ def dashboard():
 
             columnas_deseadas = [
 
-                 "FECHA DEL REPORTE",
-
+                "FECHA DEL REPORTE",
                 "ACCIÓN/ CONDICIÓN",
-
                 "DETALLE",
-
                 "LUGAR / MAQUINA / EQUIPO",
-
                 "POSIBLES CONCECUENCIAS",
-
                 "ÁREA",
-
                 "RESPONSABLE",
-
                 "ACCION CORRECTIVA",
-
                 "ESTADO"
 
             ]
-
-# Solo mostrar las columnas que existan en el Excel
 
             columnas = [
 
@@ -360,6 +350,40 @@ def dashboard():
 
             tabla = pendientes[columnas].copy()
 
+    # ============================================
+    # FORMATEAR FECHA
+    # ============================================
+
+            if "FECHA DEL REPORTE" in tabla.columns:
+
+                try:
+
+                    if pd.api.types.is_numeric_dtype(tabla["FECHA DEL REPORTE"]):
+
+                        tabla["FECHA DEL REPORTE"] = pd.to_datetime(
+
+                            tabla["FECHA DEL REPORTE"],
+
+                            unit="D",
+
+                            origin="1899-12-30"
+
+                        ).dt.strftime("%d/%m/%Y")
+
+                    else:
+
+                        tabla["FECHA DEL REPORTE"] = pd.to_datetime(
+
+                            tabla["FECHA DEL REPORTE"],
+
+                            errors="coerce"
+
+                        ).dt.strftime("%d/%m/%Y")
+
+                except Exception:
+
+                    pass
+
             st.dataframe(
 
                 tabla,
@@ -370,17 +394,11 @@ def dashboard():
 
             )
 
-                    # ==========================================================
-        # INFORMACIÓN ADICIONAL
-        # ==========================================================
+            st.caption(
 
-        st.caption(
+                f"Total de condiciones abiertas en {area_card}: {len(pendientes)}"
 
-            f"Total de condiciones abiertas en {area_card}: "
-
-            f"{len(pendientes)}"
-
-        )
+            )
 
     else:
 
