@@ -334,8 +334,9 @@ def dashboard():
                 "ÁREA",
                 "RESPONSABLE",
                 "ACCION CORRECTIVA",
+                "Detalle",
                 "ESTADO"
-
+                
             ]
 
             columnas = [
