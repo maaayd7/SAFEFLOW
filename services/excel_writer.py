@@ -13,21 +13,38 @@ class ExcelWriter:
             / "condiciones.xlsx"
         )
 
+    print("ESTOY USANDO ESTE EXCEL_WRITER")
     def guardar_reporte(
+
         self,
+
         fecha,
+
         reportado_por,
+
         area,
+
         lugar,
+
         maquina,
+
         tipo,
+
         descripcion,
+
         consecuencia,
+
         responsable,
+
         prioridad,
+
         estado,
-        fecha_compromiso
-    ):
+
+        fecha_compromiso,
+
+        foto=""
+
+):
 
         wb = load_workbook(self.archivo)
 
@@ -50,6 +67,7 @@ class ExcelWriter:
         ws.cell(fila,11).value = prioridad
         ws.cell(fila,12).value = estado
         ws.cell(fila,13).value = fecha_compromiso
+        ws.cell(fila,14).value = foto
 
         wb.save(self.archivo)
 
