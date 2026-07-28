@@ -144,11 +144,6 @@ def nuevo_reporte():
 
             )
 
-            DashboardService().actualizar()
-            st.success(
-                "✅ Reporte registrado correctamente."
-            )
-
+            st.success("✅ Reporte registrado correctamente.")
             st.balloons()
-
             st.rerun()
