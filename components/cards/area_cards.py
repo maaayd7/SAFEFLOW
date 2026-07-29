@@ -12,8 +12,16 @@ def mostrar_tarjetas(df):
         datos["ÁREA"]
         .fillna("")
         .astype(str)
-        .str.strip()
         .str.upper()
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True)
+        .replace({
+            "CORTE & CONFORMADO": "CORTE Y CONFORMADO",
+            "CORTE  Y  CONFORMADO": "CORTE Y CONFORMADO",
+            "LOGISTICA": "LOGÍSTICA",
+            "MANTENIMIENTO MECANICO": "MANTENIMIENTO MECÁNICO",
+            "MANTENIMIENTO ELECTRICO": "MANTENIMIENTO ELÉCTRICO"
+        })
     )
 
     datos["ESTADO"] = (
@@ -33,6 +41,10 @@ def mostrar_tarjetas(df):
 
     columnas = st.columns(3)
 
+    # Eliminar áreas vacías
+    datos = datos[
+        datos["ÁREA"] != ""
+    ]
     for i, area in enumerate(sorted(datos["ÁREA"].unique())):
 
         abiertos = len(
@@ -104,7 +116,7 @@ Condiciones Abiertas
 
             if st.button(
                 f"📂 Entrar",
-                key=area,
+                key=f"area_{i}",
                 width="stretch"
             ):
                 area_seleccionada = area
