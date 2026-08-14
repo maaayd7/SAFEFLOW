@@ -49,19 +49,42 @@ def mostrar_tarjetas(df):
 
         abiertos = len(
             datos[
-                (datos["ÁREA"] == area) &
+                (datos["ÁREA"] == area)
+                &
                 (datos["ESTADO"] == "ABIERTO")
             ]
         )
-
+        
+        en_proceso = len(
+            datos[
+                (datos["ÁREA"] == area)
+                &
+                (datos["ESTADO"] == "EN PROCESO")
+            ]
+        )
+        
+        atrasados = len(
+            datos[
+                (datos["ÁREA"] == area)
+                &
+                (datos["ESTADO"] == "ATRASADO")
+            ]
+        )
+        
         cerrados = len(
             datos[
-                (datos["ÁREA"] == area) &
+                (datos["ÁREA"] == area)
+                &
                 (datos["ESTADO"] == "CERRADO")
             ]
         )
 
-        total = abiertos + cerrados
+        total = (
+            abiertos
+            + en_proceso
+            + atrasados
+            + cerrados
+        )
 
         porcentaje = 0
 
@@ -100,6 +123,18 @@ Condiciones Abiertas
 </p>
 
 <hr>
+
+<p style='color:#ef4444'>
+🔴 Abiertas: <b>{abiertos}</b>
+</p>
+
+<p style='color:#f59e0b'>
+🟡 En Proceso: <b>{en_proceso}</b>
+</p>
+
+<p style='color:#dc2626'>
+⏰ Atrasadas: <b>{atrasados}</b>
+</p>
 
 <p style='color:#22c55e'>
 🟢 Cerradas: <b>{cerrados}</b>
