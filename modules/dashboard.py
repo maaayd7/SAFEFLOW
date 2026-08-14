@@ -28,37 +28,30 @@ def dashboard():
     c1, c2, c3, c4 = st.columns(4)
 
     with c1:
-
         area = st.selectbox(
-
             "Área",
-
-            ["TODAS"] +
-
-            sorted(df["ÁREA"].dropna().unique().tolist())
-
+            ["TODAS"] + (
+                sorted(df["ÁREA"].dropna().unique().tolist())
+                if "ÁREA" in df.columns
+                else []
+            ),
+            key="filtro_area"
         )
-
+    
     with c2:
-
         estado = st.selectbox(
-
             "Estado",
-
             [
-
                 "TODOS",
                 "ABIERTO",
-                "CERRADO",
                 "EN PROCESO",
-                "ATRASADO"
-
-            ]
-
+                "ATRASADO",
+                "CERRADO"
+            ],
+            key="filtro_estado"
         )
-
+    
     with c3:
-
         responsable = st.selectbox(
             "Responsable",
             ["TODOS"] + (
@@ -71,29 +64,25 @@ def dashboard():
                 )
                 if "RESPONSABLE DE ÁREA" in df.columns
                 else []
-            )
+            ),
+            key="filtro_responsable"
         )
-        
-        responsable = st.selectbox(
-
-            "Responsable",
-
-            ["TODOS"] +
-
-            sorted(df["RESPONSABLE DE ÁREA"].dropna().unique().tolist())
-
-        )
-
+    
     with c4:
-
         prioridad = st.selectbox(
-
             "Priorización",
-
-            ["TODAS"] +
-
-            sorted(df["PRIORIZACIÓN"].dropna().unique().tolist())
-
+            ["TODAS"] + (
+                sorted(
+                    df["PRIORIZACIÓN"]
+                    .dropna()
+                    .astype(str)
+                    .unique()
+                    .tolist()
+                )
+                if "PRIORIZACIÓN" in df.columns
+                else []
+            ),
+            key="filtro_prioridad"
         )
 
     # ==========================================================
