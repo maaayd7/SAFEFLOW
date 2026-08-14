@@ -241,7 +241,7 @@ class ChartService:
 
             abiertos
 
-            .groupby("RESPONSABLE")
+            .groupby("RESPONSABLE DE ÁREA")
 
             .size()
 
