@@ -80,7 +80,7 @@ def dashboard():
 
             ["TODOS"] +
 
-            sorted(df["RESPONSABLE"].dropna().unique().tolist())
+            sorted(df["RESPONSABLE DE ÁREA"].dropna().unique().tolist())
 
         )
 
