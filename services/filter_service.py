@@ -7,79 +7,144 @@ class FilterService:
 
         self.df = df.copy()
 
+        # ==========================================
+        # LIMPIAR NOMBRES DE COLUMNAS
+        # ==========================================
+
         self.df.columns = (
             self.df.columns
             .astype(str)
             .str.strip()
         )
 
-        # --------------------------
-        # LIMPIEZA
-        # --------------------------
-
-        for columna in self.df.columns:
-
-            if self.df[columna].dtype == object:
-
-                self.df[columna] = (
-                    self.df[columna]
-                    .fillna("")
-                    .astype(str)
-                    .str.strip()
-                )
-
-        # ÁREA
+        # ==========================================
+        # NORMALIZAR ÁREAS
+        # ==========================================
 
         if "ÁREA" in self.df.columns:
 
             self.df["ÁREA"] = (
                 self.df["ÁREA"]
+                .fillna("")
+                .astype(str)
                 .str.upper()
+                .str.strip()
+                .str.replace(r"\s+", " ", regex=True)
+                .replace({
+
+                    "CORTE & CONFORMADO": "CORTE Y CONFORMADO",
+
+                    "CORTE Y CONFORMADO": "CORTE Y CONFORMADO",
+
+                    "LOGISTICA": "LOGÍSTICA",
+
+                    "MANTENIMIENTO MECANICO": "MANTENIMIENTO MECÁNICO",
+
+                    "MANTENIMIENTO ELECTRICO": "MANTENIMIENTO ELÉCTRICO"
+
+                })
             )
 
-        # RESPONSABLE
-
-        if "RESPONSABLE" in self.df.columns:
-
-            self.df["RESPONSABLE"] = (
-                self.df["RESPONSABLE"]
-                .str.upper()
-            )
-
-        # ESTADO
+        # ==========================================
+        # NORMALIZAR ESTADOS
+        # ==========================================
 
         if "ESTADO" in self.df.columns:
 
-            estado = (
+            self.df["ESTADO"] = (
                 self.df["ESTADO"]
+                .fillna("ABIERTO")
+                .astype(str)
                 .str.upper()
+                .str.strip()
+                .str.replace(r"\s+", " ", regex=True)
+                .replace({
+
+                    "ABIERTA": "ABIERTO",
+
+                    "ABIERTO": "ABIERTO",
+
+                    "EN PROCESO": "EN PROCESO",
+
+                    "ENPROCESO": "EN PROCESO",
+
+                    "CERRADA": "CERRADO",
+
+                    "CERRADO": "CERRADO"
+
+                })
             )
 
-            estado = estado.replace({
+        # ==========================================
+        # NORMALIZAR FECHA PROPUESTA DE CIERRE
+        # ==========================================
 
-                "ABIERTA":"ABIERTO",
-                "ABIERTO ":"ABIERTO",
-                " ABIERTO":"ABIERTO",
+        if "FECHA PROPUESTA DE CIERRE" in self.df.columns:
 
-                "CERRADA":"CERRADO",
-                "CERRADO ":"CERRADO",
-                " CERRADO":"CERRADO"
+            self.df["FECHA PROPUESTA DE CIERRE"] = (
+                pd.to_datetime(
+                    self.df["FECHA PROPUESTA DE CIERRE"],
+                    errors="coerce",
+                    dayfirst=True
+                )
+            )
 
-            })
+        # ==========================================
+        # CALCULAR ATRASADOS
+        # ==========================================
 
-            self.df["ESTADO"] = estado
+        if (
+            "ESTADO" in self.df.columns
+            and "FECHA PROPUESTA DE CIERRE" in self.df.columns
+        ):
 
-    # ----------------------------------------
+            hoy = pd.Timestamp.today().normalize()
+
+            atrasados = (
+
+                self.df["ESTADO"].isin([
+                    "ABIERTO",
+                    "EN PROCESO"
+                ])
+
+                &
+
+                self.df["FECHA PROPUESTA DE CIERRE"].notna()
+
+                &
+
+                (
+                    self.df["FECHA PROPUESTA DE CIERRE"]
+                    < hoy
+                )
+            )
+
+            self.df.loc[
+                atrasados,
+                "ESTADO"
+            ] = "ATRASADO"
+
+    # ==========================================
+    # APLICAR FILTROS
+    # ==========================================
 
     def aplicar(
+
         self,
-        area,
-        estado,
-        responsable,
-        prioridad
+
+        area="TODAS",
+
+        estado="TODOS",
+
+        responsable="TODOS",
+
+        prioridad="TODAS"
+
     ):
 
         df = self.df.copy()
+
+        # ÁREA
 
         if area != "TODAS":
 
@@ -87,19 +152,31 @@ class FilterService:
                 df["ÁREA"] == area
             ]
 
+        # ESTADO
+
         if estado != "TODOS":
 
             df = df[
                 df["ESTADO"] == estado
             ]
 
-        if responsable != "TODOS":
+        # RESPONSABLE
+
+        if (
+            responsable != "TODOS"
+            and "RESPONSABLE DE ÁREA" in df.columns
+        ):
 
             df = df[
-                df["RESPONSABLE"] == responsable
+                df["RESPONSABLE DE ÁREA"] == responsable
             ]
 
-        if prioridad != "TODAS":
+        # PRIORIDAD
+
+        if (
+            prioridad != "TODAS"
+            and "PRIORIZACIÓN" in df.columns
+        ):
 
             df = df[
                 df["PRIORIZACIÓN"] == prioridad
