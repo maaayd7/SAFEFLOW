@@ -231,60 +231,89 @@ class ChartService:
 
     def grafico_responsables(self):
 
-        abiertos = self.df[
-
-            self.df["ESTADO"] == "ABIERTO"
-
-        ]
-
-        datos = (
-
-            abiertos
-
-            .groupby("RESPONSABLE DE ÁREA")
-
-            .size()
-
-            .reset_index(name="Cantidad")
-
-            .sort_values(
-
-                "Cantidad",
-
-                ascending=False
-
+        # ==========================================================
+        # VALIDAR COLUMNA
+        # ==========================================================
+    
+        columna = "RESPONSABLE DE ÁREA"
+    
+        if columna not in self.df.columns:
+    
+            fig = px.bar(
+                title="Condiciones por Responsable"
             )
-
-            .head(10)
-
+    
+            fig.update_layout(
+                title="Condiciones por Responsable",
+                xaxis_title="Responsable",
+                yaxis_title="Cantidad"
+            )
+    
+            return fig
+    
+        # ==========================================================
+        # PREPARAR DATOS
+        # ==========================================================
+    
+        datos = self.df.copy()
+    
+        datos[columna] = (
+            datos[columna]
+            .fillna("SIN RESPONSABLE")
+            .astype(str)
+            .str.strip()
         )
-
+    
+        # Evitar valores vacíos
+        datos.loc[
+            datos[columna] == "",
+            columna
+        ] = "SIN RESPONSABLE"
+    
+        # ==========================================================
+        # AGRUPAR
+        # ==========================================================
+    
+        resumen = (
+            datos
+            .groupby(columna)
+            .size()
+            .reset_index(name="TOTAL")
+            .sort_values(
+                "TOTAL",
+                ascending=False
+            )
+        )
+    
+        # ==========================================================
+        # RENOMBRAR PARA GRÁFICO
+        # ==========================================================
+    
+        resumen = resumen.rename(
+            columns={
+                columna: "RESPONSABLE"
+            }
+        )
+    
+        # ==========================================================
+        # CREAR GRÁFICO
+        # ==========================================================
+    
         fig = px.bar(
-
-            datos,
-
+            resumen,
             x="RESPONSABLE",
-
-            y="Cantidad",
-
-            color="Cantidad",
-
-            text_auto=True,
-
-            title="Top 10 Responsables con más Condiciones Abiertas"
-
+            y="TOTAL",
+            text="TOTAL",
+            title="Condiciones por Responsable"
         )
-
+    
         fig.update_layout(
-
-            showlegend=False,
-
-            xaxis_title="",
-
-            yaxis_title="Condiciones",
-
-            xaxis_tickangle=-35
-
+            xaxis_title="Responsable",
+            yaxis_title="Cantidad de condiciones"
         )
-
+    
+        fig.update_traces(
+            textposition="outside"
+        )
+    
         return fig
