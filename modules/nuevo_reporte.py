@@ -76,6 +76,7 @@ def nuevo_reporte():
                 "Estado",
                 [
                     "ABIERTO",
+                    "EN PROCESO",
                     "CERRADO"
                 ]
             )
