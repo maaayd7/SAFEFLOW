@@ -3,15 +3,51 @@ from database.excel_reader import ExcelReader
 
 class DashboardService:
 
+    _cache = None
+
     def __init__(self):
-        self.excel = ExcelReader()
-        self.data = self.excel.load()
+
+        self.reader = ExcelReader()
+
+        if DashboardService._cache is None:
+
+            DashboardService._cache = self.reader.load()
+
+        self.data = DashboardService._cache
+
+    # ==================================================
+    # ACTUALIZAR DATOS
+    # ==================================================
+
+    def actualizar(self):
+
+        DashboardService._cache = self.reader.load()
+
+        self.data = DashboardService._cache
+
+    # ==================================================
+    # OBTENER HOJAS
+    # ==================================================
 
     def hojas(self):
-        return self.excel.sheet_names()
+
+        return list(self.data.keys())
+
+    # ==================================================
+    # OBTENER DATAFRAME
+    # ==================================================
 
     def dataframe(self, hoja):
-        return self.excel.sheet(hoja)
+
+        if hoja in self.data:
+
+            return self.data[hoja].copy()
+
+        raise ValueError(f"No existe la hoja {hoja}")
+
+    # ==================================================
+    # RESUMEN
+    # ==================================================
 
     def resumen(self):
 
@@ -19,12 +55,14 @@ class DashboardService:
 
         for hoja, df in self.data.items():
 
-            resumen.append(
-                {
-                    "Hoja": hoja,
-                    "Registros": len(df),
-                    "Columnas": len(df.columns)
-                }
-            )
+            resumen.append({
+
+                "Hoja": hoja,
+
+                "Registros": len(df),
+
+                "Columnas": len(df.columns)
+
+            })
 
         return resumen
