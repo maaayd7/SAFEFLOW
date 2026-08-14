@@ -220,7 +220,19 @@ def dashboard():
 
     if area_card:
 
-        pendientes = df_original.copy()
+        pendientes = df_original[
+            (
+                df_original["ÁREA"] == area_card
+            )
+            &
+            (
+                df_original["ESTADO"].isin([
+                    "ABIERTO",
+                    "EN PROCESO",
+                    "ATRASADO"
+                ])
+            )
+        ].copy()
 
         pendientes["ÁREA"] = (
 
@@ -296,16 +308,32 @@ def dashboard():
 
             columnas_deseadas = [
 
+                "NÚMERO",
+            
                 "FECHA DEL REPORTE",
+            
                 "ACCIÓN/ CONDICIÓN",
-                "DETALLE",
-                "LUGAR / MAQUINA / EQUIPO",
-                "POSIBLES CONCECUENCIAS",
+            
+                "Detalle",
+            
+                "RIESGOS",
+            
+                "PRIORIZACIÓN",
+            
                 "ÁREA",
-                "RESPONSABLE",
+            
+                "LUGAR / MAQUINA / EQUIPO",
+            
+                "RESPONSABLE DE ÁREA",
+            
                 "ACCION CORRECTIVA",
+            
+                "RESPONSABLE DE CIERRE",
+            
+                "FECHA PROPUESTA DE CIERRE",
+            
                 "ESTADO"
-
+            
             ]
 
             columnas = [
@@ -319,6 +347,23 @@ def dashboard():
             ]
 
             tabla = pendientes[columnas].copy()
+
+            for columna_fecha in [
+
+                "FECHA DEL REPORTE",
+
+                "FECHA PROPUESTA DE CIERRE",
+
+                "FECHA REAL DE CIERRE"
+
+            ]:
+
+                if columna_fecha in tabla.columns:
+            
+                    tabla[columna_fecha] = pd.to_datetime(
+                        tabla[columna_fecha],
+                        errors="coerce"
+                    ).dt.strftime("%d/%m/%Y")
 
     # ============================================
     # FORMATEAR FECHA
