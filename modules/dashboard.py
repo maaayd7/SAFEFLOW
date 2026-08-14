@@ -48,10 +48,10 @@ def dashboard():
             [
 
                 "TODOS",
-
                 "ABIERTO",
-
-                "CERRADO"
+                "CERRADO",
+                "EN PROCESO",
+                "ATRASADO"
 
             ]
 
@@ -59,6 +59,21 @@ def dashboard():
 
     with c3:
 
+        responsable = st.selectbox(
+            "Responsable",
+            ["TODOS"] + (
+                sorted(
+                    df["RESPONSABLE DE ÁREA"]
+                    .dropna()
+                    .astype(str)
+                    .unique()
+                    .tolist()
+                )
+                if "RESPONSABLE DE ÁREA" in df.columns
+                else []
+            )
+        )
+        
         responsable = st.selectbox(
 
             "Responsable",
@@ -99,100 +114,55 @@ def dashboard():
     )
 
     abiertas = len(
-
-        df_dashboard[
-            df_dashboard["ESTADO"] == "ABIERTO"
-        ]
-
+        df[df["ESTADO"] == "ABIERTO"]
     )
-
+    
+    en_proceso = len(
+        df[df["ESTADO"] == "EN PROCESO"]
+    )
+    
+    atrasadas = len(
+        df[df["ESTADO"] == "ATRASADO"]
+    )
+    
     cerradas = len(
-
-        df_dashboard[
-            df_dashboard["ESTADO"] == "CERRADO"
-        ]
-
+        df[df["ESTADO"] == "CERRADO"]
     )
-
-    if "PRIORIZACIÓN" in df_dashboard.columns:
-
-        criticas = len(
-
-            df_dashboard[
-
-                df_dashboard["PRIORIZACIÓN"]
-
-                .str.upper()
-
-                .isin(
-
-                    [
-
-                        "ALTA",
-
-                        "CRÍTICA",
-
-                        "CRITICA"
-
-                    ]
-
-                )
-
-            ]
-
-        )
-
-    else:
-
-        criticas = 0
-
-    porcentaje = 0
-
-    if len(df_dashboard) > 0:
-
-        porcentaje = round(
-
-            cerradas * 100 / len(df_dashboard),
-
-            1
-
-        )
+    
+    criticas = len(
+        df[
+            df["PRIORIZACIÓN"]
+            .fillna("")
+            .astype(str)
+            .str.upper()
+            .isin([
+                "ALTA",
+                "CRÍTICA",
+                "CRITICA"
+            ])
+        ]
+    )
+    
+    porcentaje = round(
+        cerradas * 100 / len(df),
+        1
+    ) if len(df) > 0 else 0
 
     st.divider()
 
-    k1, k2, k3, k4 = st.columns(4)
+    k1, k2, k3, k4, k5, k6 = st.columns(6)
 
-    k1.metric(
-
-        "🔴 Abiertas",
-
-        abiertas
-
-    )
-
-    k2.metric(
-
-        "🟢 Cerradas",
-
-        cerradas
-
-    )
-
-    k3.metric(
-
-        "⚠️ Críticas",
-
-        criticas
-
-    )
-
-    k4.metric(
-
-        "% Cierre",
-
-        f"{porcentaje}%"
-
-    )
+    k1.metric("🔴 Abiertas", abiertas)
+    
+    k2.metric("🟡 En Proceso", en_proceso)
+    
+    k3.metric("🔴 Atrasadas", atrasadas)
+    
+    k4.metric("🟢 Cerradas", cerradas)
+    
+    k5.metric("⚠️ Críticas", criticas)
+    
+    k6.metric("% Cierre", f"{porcentaje}%")
 
     # ==========================================================
     # GRÁFICOS
