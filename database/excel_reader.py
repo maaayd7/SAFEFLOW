@@ -1,47 +1,33 @@
-from pathlib import Path
 import pandas as pd
+from pathlib import Path
 
 
 class ExcelReader:
 
     def __init__(self):
 
-        self.base_dir = Path(__file__).resolve().parent.parent
-        self.file = self.base_dir / "data" / "condiciones.xlsx"
+        self.base = Path(__file__).resolve().parent.parent
+
+        self.ruta = self.base / "data" / "condiciones.xlsx"
 
     def load(self):
 
-        xls = pd.ExcelFile(self.file)
-
-        hojas = {}
-
-        for hoja in xls.sheet_names:
-
-            df = pd.read_excel(
-                self.file,
-                sheet_name=hoja,
-                header=1
-            )
-
-            # Elimina la fila auxiliar que queda después del encabezado
-            df = df.iloc[1:].reset_index(drop=True)
-
-            hojas[hoja] = df
-
-        return hojas
-
-    def sheet_names(self):
-
-        return pd.ExcelFile(self.file).sheet_names
-
-    def sheet(self, nombre):
-
         df = pd.read_excel(
-            self.file,
-            sheet_name=nombre,
+            self.ruta,
+            sheet_name="Base",
             header=1
         )
 
-        df = df.iloc[1:].reset_index(drop=True)
+        # ==========================================
+        # LIMPIAR NOMBRES DE COLUMNAS
+        # ==========================================
 
-        return df
+        df.columns = (
+            df.columns
+            .astype(str)
+            .str.strip()
+        )
+
+        return {
+            "Base": df
+        }
