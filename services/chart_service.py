@@ -44,10 +44,10 @@ class ChartService:
         # RESPONSABLE
         # ==================================================
 
-        if "RESPONSABLE" in self.df.columns:
+        if "RESPONSABLE DE ÁREA" in self.df.columns:
 
-            self.df["RESPONSABLE"] = (
-                self.df["RESPONSABLE"]
+            self.df["RESPONSABLE DE ÁREA"] = (
+                self.df["RESPONSABLE DE ÁREA"]
                 .str.upper()
             )
 
