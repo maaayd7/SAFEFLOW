@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from openpyxl import load_workbook
 
 
@@ -13,61 +12,101 @@ class ExcelWriter:
             / "condiciones.xlsx"
         )
 
-    print("ESTOY USANDO ESTE EXCEL_WRITER")
+    # ==========================================================
+    # GUARDAR NUEVO REPORTE
+    # ==========================================================
+
     def guardar_reporte(
 
         self,
 
-        fecha,
+        numero,
 
-        reportado_por,
+        fecha_reporte,
+
+        accion_condicion,
+
+        detalle,
+
+        riesgos,
+
+        priorizacion,
 
         area,
 
-        lugar,
+        lugar_maquina_equipo,
 
-        maquina,
+        responsable_area,
 
-        tipo,
+        accion_correctiva,
 
-        descripcion,
+        responsable_cierre,
 
-        consecuencia,
+        fecha_propuesta_cierre,
 
-        responsable,
-
-        prioridad,
+        fecha_real_cierre,
 
         estado,
 
-        fecha_compromiso,
+        evidencia_fotografica=""
 
-        foto=""
+    ):
 
-):
+        # ==========================================================
+        # ABRIR EXCEL
+        # ==========================================================
 
         wb = load_workbook(self.archivo)
 
-        ws = wb.active
+        # Usar específicamente la hoja Base
+        ws = wb["Base"]
 
+        # Siguiente fila disponible
         fila = ws.max_row + 1
+
+        # ==========================================================
+        # GENERAR NÚMERO AUTOMÁTICO
+        # ==========================================================
 
         numero = fila - 2
 
+        # ==========================================================
+        # GUARDAR DATOS
+        # ==========================================================
+
         ws.cell(fila, 1).value = numero
-        ws.cell(fila, 2).value = fecha
-        ws.cell(fila, 3).value = tipo
-        ws.cell(fila, 4).value = descripcion
-        ws.cell(fila, 5).value = consecuencia
-        ws.cell(fila, 6).value = area
-        ws.cell(fila, 7).value = lugar
-        ws.cell(fila, 8).value = maquina
-        ws.cell(fila, 9).value = reportado_por
-        ws.cell(fila,10).value = responsable
-        ws.cell(fila,11).value = prioridad
-        ws.cell(fila,12).value = estado
-        ws.cell(fila,13).value = fecha_compromiso
-        ws.cell(fila,14).value = foto
+
+        ws.cell(fila, 2).value = fecha_reporte
+
+        ws.cell(fila, 3).value = accion_condicion
+
+        ws.cell(fila, 4).value = detalle
+
+        ws.cell(fila, 5).value = riesgos
+
+        ws.cell(fila, 6).value = priorizacion
+
+        ws.cell(fila, 7).value = area
+
+        ws.cell(fila, 8).value = lugar_maquina_equipo
+
+        ws.cell(fila, 9).value = responsable_area
+
+        ws.cell(fila, 10).value = accion_correctiva
+
+        ws.cell(fila, 11).value = responsable_cierre
+
+        ws.cell(fila, 12).value = fecha_propuesta_cierre
+
+        ws.cell(fila, 13).value = fecha_real_cierre
+
+        ws.cell(fila, 14).value = estado
+
+        ws.cell(fila, 15).value = evidencia_fotografica
+
+        # ==========================================================
+        # GUARDAR Y CERRAR
+        # ==========================================================
 
         wb.save(self.archivo)
 
