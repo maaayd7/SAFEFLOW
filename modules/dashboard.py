@@ -25,16 +25,6 @@ def dashboard():
     # Copia para filtros, indicadores y gráficos
     df = df_normalizado.copy()
     
-    # ==========================================================
-    # APLICAR FILTROS GENERALES SOLO PARA KPIs Y GRÁFICOS
-    # ==========================================================
-    
-    df = filtro.aplicar(
-        area,
-        estado,
-        responsable,
-        prioridad
-    )
 
     # ==========================================================
     # FILTROS
@@ -120,24 +110,24 @@ def dashboard():
     )
 
     abiertas = len(
-        df[df["ESTADO"] == "ABIERTO"]
+        df_dashboard[df_dashboard["ESTADO"] == "ABIERTO"]
     )
     
     en_proceso = len(
-        df[df["ESTADO"] == "EN PROCESO"]
+        df_dashboard[df_dashboard["ESTADO"] == "EN PROCESO"]
     )
     
     atrasadas = len(
-        df[df["ESTADO"] == "ATRASADO"]
+        df_dashboard[df_dashboard["ESTADO"] == "ATRASADO"]
     )
     
     cerradas = len(
-        df[df["ESTADO"] == "CERRADO"]
+        df_dashboard[df_dashboard["ESTADO"] == "CERRADO"]
     )
     
     criticas = len(
-        df[
-            df["PRIORIZACIÓN"]
+        df_dashboard[
+            df_dashboard["PRIORIZACIÓN"]
             .fillna("")
             .astype(str)
             .str.upper()
@@ -150,9 +140,9 @@ def dashboard():
     )
     
     porcentaje = round(
-        cerradas * 100 / len(df),
+        cerradas * 100 / len(df_dashboard),
         1
-    ) if len(df) > 0 else 0
+    ) if len(df_dashboard) > 0 else 0
 
     st.divider()
 
@@ -283,18 +273,22 @@ def dashboard():
         pendientes = pendientes[
 
             (pendientes["ÁREA"] == area_card)
-
+        
             &
-
-            (pendientes["ESTADO"] == "ABIERTO")
-
-        ]
+        
+            (pendientes["ESTADO"].isin([
+                "ABIERTO",
+                "EN PROCESO",
+                "ATRASADO"
+            ]))
+        
+        ].copy()
 
         st.divider()
 
         st.subheader(
 
-            f"Condiciones Abiertas - {area_card}"
+            f"Condiciones Pendientes - {area_card}"
 
         )
 
@@ -302,7 +296,7 @@ def dashboard():
 
             st.success(
 
-                "No existen condiciones abiertas para esta área."
+                "No existen condiciones abiertas, en proceso o atrasadas para esta área."
 
             )
 
@@ -417,7 +411,7 @@ def dashboard():
 
             st.caption(
 
-                f"Total de condiciones abiertas en {area_card}: {len(pendientes)}"
+                f"Total de condiciones pendientes en {area_card}: {len(pendientes)}"
 
             )
 
