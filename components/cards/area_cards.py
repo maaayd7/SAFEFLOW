@@ -139,57 +139,57 @@ def mostrar_tarjetas(df):
 
             st.markdown(
                 f"""
-                <div style='
-                    background-color:#1f2937;
-                    padding:20px;
-                    border-radius:12px;
-                    border-left:8px solid {color_borde};
-                    margin-bottom:15px;
-                '>
-
-                    <h3 style='
-                        text-align:center;
-                        color:white;
-                    '>
+                <div style="
+                    background-color: #1f2937;
+                    padding: 20px;
+                    border-radius: 12px;
+                    border-left: 8px solid {color_borde};
+                    margin-bottom: 15px;
+                ">
+            
+                    <h3 style="
+                        text-align: center;
+                        color: white;
+                    ">
                         🏭 {area}
                     </h3>
-
-                    <h1 style='
-                        text-align:center;
-                        color:#facc15;
-                    '>
+            
+                    <h1 style="
+                        text-align: center;
+                        color: #facc15;
+                    ">
                         {abiertos}
                     </h1>
-
-                    <p style='
-                        text-align:center;
-                        color:white;
-                    '>
+            
+                    <p style="
+                        text-align: center;
+                        color: white;
+                    ">
                         Condiciones Abiertas
                     </p>
-
-                    <hr style='border-color:#4b5563;'>
-
-                    <p style='color:#facc15'>
+            
+                    <hr style="border-color: #4b5563;">
+            
+                    <p style="color: #facc15;">
                         🟡 Abiertas: <b>{abiertos}</b>
                     </p>
-
-                    <p style='color:#3b82f6'>
+            
+                    <p style="color: #3b82f6;">
                         🔵 En Proceso: <b>{en_proceso}</b>
                     </p>
-
-                    <p style='color:#ef4444'>
+            
+                    <p style="color: #ef4444;">
                         🔴 Atrasadas: <b>{atrasados}</b>
                     </p>
-
-                    <p style='color:#22c55e'>
+            
+                    <p style="color: #22c55e;">
                         🟢 Cerradas: <b>{cerrados}</b>
                     </p>
-
-                    <p style='color:white'>
+            
+                    <p style="color: white;">
                         📈 % Cierre: <b>{porcentaje}%</b>
                     </p>
-
+            
                 </div>
                 """,
                 unsafe_allow_html=True
