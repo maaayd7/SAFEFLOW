@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 from services.dashboard_service import DashboardService
 from services.filter_service import FilterService
@@ -203,24 +204,6 @@ def dashboard():
     # TARJETAS POR ÁREA
     # (NO AFECTAN KPIs NI GRÁFICOS)
     # ==========================================================
-
-    st.markdown(
-        """
-        <div id="detalle-condiciones"></div>
-        <script>
-            setTimeout(function() {
-                const elemento = document.getElementById("detalle-condiciones");
-                if (elemento) {
-                    elemento.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-                }
-            }, 300);
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
     
     st.divider()
 
@@ -231,9 +214,29 @@ def dashboard():
     # ==========================================================
     # DETALLE DEL ÁREA SELECCIONADA
     # ==========================================================
-
+    
+    st.markdown(
+        '<div id="detalle-condiciones"></div>',
+        unsafe_allow_html=True
+    )
+    
     if area_card:
-
+        components.html(
+            """
+            <script>
+                setTimeout(function() {
+                    window.parent.document
+                        .getElementById("detalle-condiciones")
+                        ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                }, 500);
+            </script>
+            """,
+            height=0,
+            width=0
+        )
         pendientes = df_normalizado[
             (
                 df_normalizado["ÁREA"] == area_card
