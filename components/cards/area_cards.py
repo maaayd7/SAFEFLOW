@@ -20,7 +20,7 @@ def mostrar_tarjetas(df):
         .str.upper()
     )
 
-    # Eliminar áreas vacías para evitar botones sin key
+    # Eliminar áreas vacías
     datos = datos[datos["ÁREA"] != ""].copy()
 
     # ==========================================================
@@ -46,9 +46,6 @@ def mostrar_tarjetas(df):
         "CERRADA": "CERRADO",
         "CERRADO": "CERRADO",
 
-        "EN PROCESO": "EN PROCESO",
-        "EN PROCESO ": "EN PROCESO",
-
         "ATRASADA": "ATRASADO",
         "ATRASADO": "ATRASADO"
 
@@ -69,7 +66,7 @@ def mostrar_tarjetas(df):
         ]
 
         # ==========================================================
-        # CONTAR CADA ESTADO
+        # CONTAR ESTADOS
         # ==========================================================
 
         abiertos = len(
@@ -101,18 +98,12 @@ def mostrar_tarjetas(df):
         porcentaje = 0
 
         if total > 0:
-
             porcentaje = round(
                 cerrados * 100 / total
             )
 
         # ==========================================================
         # COLOR DEL BORDE
-        # Prioridad:
-        # ATRASADO -> ROJO
-        # ABIERTO -> AMARILLO
-        # EN PROCESO -> AZUL
-        # TODO CERRADO -> VERDE
         # ==========================================================
 
         if atrasados > 0:
@@ -137,61 +128,48 @@ def mostrar_tarjetas(df):
 
         with columnas[i % 3]:
 
+            tarjeta_html = f"""
+<div style="background-color:#1f2937;padding:20px;border-radius:12px;border-left:8px solid {color_borde};margin-bottom:15px;">
+
+<h3 style="text-align:center;color:white;">
+🏭 {area}
+</h3>
+
+<h1 style="text-align:center;color:#facc15;">
+{abiertos}
+</h1>
+
+<p style="text-align:center;color:white;">
+Condiciones Abiertas
+</p>
+
+<hr style="border-color:#4b5563;">
+
+<p style="color:#facc15;">
+🟡 Abiertas: <b>{abiertos}</b>
+</p>
+
+<p style="color:#3b82f6;">
+🔵 En Proceso: <b>{en_proceso}</b>
+</p>
+
+<p style="color:#ef4444;">
+🔴 Atrasadas: <b>{atrasados}</b>
+</p>
+
+<p style="color:#22c55e;">
+🟢 Cerradas: <b>{cerrados}</b>
+</p>
+
+<p style="color:white;">
+📈 % Cierre: <b>{porcentaje}%</b>
+</p>
+
+</div>
+"""
+
             st.markdown(
-                f"""
-                <div style="
-                    background-color: #1f2937;
-                    padding: 20px;
-                    border-radius: 12px;
-                    border-left: 8px solid {color_borde};
-                    margin-bottom: 15px;
-                ">
-            
-                    <h3 style="
-                        text-align: center;
-                        color: white;
-                    ">
-                        🏭 {area}
-                    </h3>
-            
-                    <h1 style="
-                        text-align: center;
-                        color: #facc15;
-                    ">
-                        {abiertos}
-                    </h1>
-            
-                    <p style="
-                        text-align: center;
-                        color: white;
-                    ">
-                        Condiciones Abiertas
-                    </p>
-            
-                    <hr style="border-color: #4b5563;">
-            
-                    <p style="color: #facc15;">
-                        🟡 Abiertas: <b>{abiertos}</b>
-                    </p>
-            
-                    <p style="color: #3b82f6;">
-                        🔵 En Proceso: <b>{en_proceso}</b>
-                    </p>
-            
-                    <p style="color: #ef4444;">
-                        🔴 Atrasadas: <b>{atrasados}</b>
-                    </p>
-            
-                    <p style="color: #22c55e;">
-                        🟢 Cerradas: <b>{cerrados}</b>
-                    </p>
-            
-                    <p style="color: white;">
-                        📈 % Cierre: <b>{porcentaje}%</b>
-                    </p>
-            
-                </div>
-                """,
+                tarjeta_html,
                 unsafe_allow_html=True
             )
 
