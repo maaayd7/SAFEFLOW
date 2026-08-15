@@ -237,10 +237,10 @@ def dashboard():
                     }}
                 }}, 500);
             </script>
+            <div id="scroll-{area_card}"></div>
             """,
             height=0,
-            width=0,
-            key=f"scroll_detalle_{area_card}"
+            width=0
         )
         pendientes = df_normalizado[
             (
