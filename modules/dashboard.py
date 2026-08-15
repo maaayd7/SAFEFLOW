@@ -204,6 +204,24 @@ def dashboard():
     # (NO AFECTAN KPIs NI GRÁFICOS)
     # ==========================================================
 
+    st.markdown(
+        """
+        <div id="detalle-condiciones"></div>
+        <script>
+            setTimeout(function() {
+                const elemento = document.getElementById("detalle-condiciones");
+                if (elemento) {
+                    elemento.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }
+            }, 300);
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+    
     st.divider()
 
     st.subheader("Condiciones por Área")
