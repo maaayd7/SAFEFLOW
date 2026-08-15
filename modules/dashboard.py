@@ -12,12 +12,29 @@ def dashboard():
     dashboard_service = DashboardService()
 
     hoja = dashboard_service.hojas()[0]
-
+    
+    # Cargar Excel
     df_original = dashboard_service.dataframe(hoja)
-
+    
+    # Normalizar áreas y estados
     filtro = FilterService(df_original)
-
-    df = filtro.df
+    
+    # Este se usará para TARJETAS y DETALLE
+    df_normalizado = filtro.df.copy()
+    
+    # Copia para filtros, indicadores y gráficos
+    df = df_normalizado.copy()
+    
+    # ==========================================================
+    # APLICAR FILTROS GENERALES SOLO PARA KPIs Y GRÁFICOS
+    # ==========================================================
+    
+    df = filtro.aplicar(
+        area,
+        estado,
+        responsable,
+        prioridad
+    )
 
     # ==========================================================
     # FILTROS
@@ -201,7 +218,7 @@ def dashboard():
 
     st.subheader("Condiciones por Área")
 
-    area_card = mostrar_tarjetas(df_original)
+    area_card = mostrar_tarjetas(df_normalizado)
 
     # ==========================================================
     # DETALLE DEL ÁREA SELECCIONADA
@@ -209,13 +226,13 @@ def dashboard():
 
     if area_card:
 
-        pendientes = df_original[
+        pendientes = df_normalizado[
             (
-                df_original["ÁREA"] == area_card
+                df_normalizado["ÁREA"] == area_card
             )
             &
             (
-                df_original["ESTADO"].isin([
+                df_normalizado["ESTADO"].isin([
                     "ABIERTO",
                     "EN PROCESO",
                     "ATRASADO"
