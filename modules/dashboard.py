@@ -329,6 +329,7 @@ def dashboard():
 
             columnas_deseadas = [
 
+                "ESTADO",
                 "NÚMERO",
             
                 "FECHA DEL REPORTE",
@@ -351,9 +352,7 @@ def dashboard():
             
                 "RESPONSABLE DE CIERRE",
             
-                "FECHA PROPUESTA DE CIERRE",
-            
-                "ESTADO"
+                "FECHA PROPUESTA DE CIERRE"
             
             ]
 
@@ -420,14 +419,46 @@ def dashboard():
 
                     pass
 
+            def pintar_estado(valor):
+
+                estado = str(valor).strip().upper()
+            
+                if estado == "ABIERTO":
+            
+                    return "background-color: #ef4444; color: white; font-weight: bold"
+            
+                elif estado == "EN PROCESO":
+            
+                    return "background-color: #f59e0b; color: black; font-weight: bold"
+            
+                elif estado == "ATRASADO":
+            
+                    return "background-color: #dc2626; color: white; font-weight: bold"
+            
+                elif estado == "CERRADO":
+            
+                    return "background-color: #22c55e; color: white; font-weight: bold"
+            
+                return ""
+            
+            
+            tabla_estilizada = tabla.style.map(
+            
+                pintar_estado,
+            
+                subset=["ESTADO"]
+            
+            )
+            
+            
             st.dataframe(
-
-                tabla,
-
+            
+                tabla_estilizada,
+            
                 hide_index=True,
-
+            
                 width="stretch"
-
+            
             )
 
             st.caption(
