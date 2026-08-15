@@ -330,7 +330,6 @@ def dashboard():
             columnas_deseadas = [
 
                 "ESTADO",
-                "NÚMERO",
             
                 "FECHA DEL REPORTE",
             
