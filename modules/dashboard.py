@@ -149,9 +149,9 @@ def dashboard():
 
     k1, k2, k3, k4, k5, k6 = st.columns(6)
 
-    k1.metric("🔴 Abiertas", abiertas)
-    
-    k2.metric("🟡 En Proceso", en_proceso)
+    k1.metric("🟡 Abiertas", abiertas)
+
+    k2.metric("🔵 En Proceso", en_proceso)
     
     k3.metric("🔴 Atrasadas", atrasadas)
     
@@ -222,20 +222,25 @@ def dashboard():
     
     if area_card:
         components.html(
-            """
+            f"""
             <script>
-                setTimeout(function() {
-                    window.parent.document
-                        .getElementById("detalle-condiciones")
-                        ?.scrollIntoView({
+                setTimeout(function() {{
+                    const elemento = window.parent.document.getElementById(
+                        "detalle-condiciones"
+                    );
+        
+                    if (elemento) {{
+                        elemento.scrollIntoView({{
                             behavior: "smooth",
                             block: "start"
-                        });
-                }, 500);
+                        }});
+                    }}
+                }}, 500);
             </script>
             """,
             height=0,
-            width=0
+            width=0,
+            key=f"scroll_detalle_{area_card}"
         )
         pendientes = df_normalizado[
             (
@@ -424,15 +429,15 @@ def dashboard():
             
                 if estado == "ABIERTO":
             
-                    return "background-color: #ef4444; color: white; font-weight: bold"
+                    return "background-color: #facc15; color: black; font-weight: bold"
             
                 elif estado == "EN PROCESO":
             
-                    return "background-color: #f59e0b; color: black; font-weight: bold"
+                    return "background-color: #3b82f6; color: white; font-weight: bold"
             
                 elif estado == "ATRASADO":
             
-                    return "background-color: #dc2626; color: white; font-weight: bold"
+                    return "background-color: #ef4444; color: white; font-weight: bold"
             
                 elif estado == "CERRADO":
             
