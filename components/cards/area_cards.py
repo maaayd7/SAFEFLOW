@@ -8,21 +8,27 @@ def mostrar_tarjetas(df):
 
     datos = df.copy()
 
+    # ==========================================================
+    # NORMALIZAR ÁREA
+    # ==========================================================
+
     datos["ÁREA"] = (
         datos["ÁREA"]
         .fillna("")
         .astype(str)
-        .str.upper()
         .str.strip()
-        .str.replace(r"\s+", " ", regex=True)
-        .replace({
-            "CORTE & CONFORMADO": "CORTE Y CONFORMADO",
-            "CORTE  Y  CONFORMADO": "CORTE Y CONFORMADO",
-            "LOGISTICA": "LOGÍSTICA",
-            "MANTENIMIENTO MECANICO": "MANTENIMIENTO MECÁNICO",
-            "MANTENIMIENTO ELECTRICO": "MANTENIMIENTO ELÉCTRICO"
-        })
+        .str.upper()
     )
+
+    # Eliminar áreas vacías para evitar botones sin key
+    datos = datos[datos["ÁREA"] != ""].copy()
+
+    # ==========================================================
+    # NORMALIZAR ESTADO
+    # ==========================================================
+
+    if "ESTADO" not in datos.columns:
+        datos["ESTADO"] = ""
 
     datos["ESTADO"] = (
         datos["ESTADO"]
@@ -33,127 +39,172 @@ def mostrar_tarjetas(df):
     )
 
     datos["ESTADO"] = datos["ESTADO"].replace({
+
         "ABIERTA": "ABIERTO",
-        "CERRADA": "CERRADO"
+        "ABIERTO": "ABIERTO",
+
+        "CERRADA": "CERRADO",
+        "CERRADO": "CERRADO",
+
+        "EN PROCESO": "EN PROCESO",
+        "EN PROCESO ": "EN PROCESO",
+
+        "ATRASADA": "ATRASADO",
+        "ATRASADO": "ATRASADO"
+
     })
 
     area_seleccionada = None
 
     columnas = st.columns(3)
 
-    # Eliminar áreas vacías
-    datos = datos[
-        datos["ÁREA"] != ""
-    ]
+    # ==========================================================
+    # RECORRER ÁREAS
+    # ==========================================================
+
     for i, area in enumerate(sorted(datos["ÁREA"].unique())):
 
+        datos_area = datos[
+            datos["ÁREA"] == area
+        ]
+
+        # ==========================================================
+        # CONTAR CADA ESTADO
+        # ==========================================================
+
         abiertos = len(
-            datos[
-                (datos["ÁREA"] == area)
-                &
-                (datos["ESTADO"] == "ABIERTO")
-            ]
-        )
-        
-        en_proceso = len(
-            datos[
-                (datos["ÁREA"] == area)
-                &
-                (datos["ESTADO"] == "EN PROCESO")
-            ]
-        )
-        
-        atrasados = len(
-            datos[
-                (datos["ÁREA"] == area)
-                &
-                (datos["ESTADO"] == "ATRASADO")
-            ]
-        )
-        
-        cerrados = len(
-            datos[
-                (datos["ÁREA"] == area)
-                &
-                (datos["ESTADO"] == "CERRADO")
+            datos_area[
+                datos_area["ESTADO"] == "ABIERTO"
             ]
         )
 
-        total = (
-            abiertos
-            + en_proceso
-            + atrasados
-            + cerrados
+        en_proceso = len(
+            datos_area[
+                datos_area["ESTADO"] == "EN PROCESO"
+            ]
         )
+
+        atrasados = len(
+            datos_area[
+                datos_area["ESTADO"] == "ATRASADO"
+            ]
+        )
+
+        cerrados = len(
+            datos_area[
+                datos_area["ESTADO"] == "CERRADO"
+            ]
+        )
+
+        total = len(datos_area)
 
         porcentaje = 0
 
         if total > 0:
-            porcentaje = int(cerrados * 100 / total)
 
-        if porcentaje >= 90:
-            color = "#22c55e"
-        elif porcentaje >= 70:
-            color = "#f59e0b"
+            porcentaje = round(
+                cerrados * 100 / total
+            )
+
+        # ==========================================================
+        # COLOR DEL BORDE
+        # Prioridad:
+        # ATRASADO -> ROJO
+        # ABIERTO -> AMARILLO
+        # EN PROCESO -> AZUL
+        # TODO CERRADO -> VERDE
+        # ==========================================================
+
+        if atrasados > 0:
+
+            color_borde = "#ef4444"
+
+        elif abiertos > 0:
+
+            color_borde = "#facc15"
+
+        elif en_proceso > 0:
+
+            color_borde = "#3b82f6"
+
         else:
-            color = "#ef4444"
+
+            color_borde = "#22c55e"
+
+        # ==========================================================
+        # MOSTRAR TARJETA
+        # ==========================================================
 
         with columnas[i % 3]:
 
             st.markdown(
                 f"""
-<div style='
-background-color:#1f2937;
-padding:20px;
-border-radius:12px;
-border-left:8px solid {color};
-margin-bottom:15px;
-'>
+                <div style='
+                    background-color:#1f2937;
+                    padding:20px;
+                    border-radius:12px;
+                    border-left:8px solid {color_borde};
+                    margin-bottom:15px;
+                '>
 
-<h3 style='text-align:center;color:white'>
-🏭 {area}
-</h3>
+                    <h3 style='
+                        text-align:center;
+                        color:white;
+                    '>
+                        🏭 {area}
+                    </h3>
 
-<h1 style='text-align:center;color:#ef4444'>
-{abiertos}
-</h1>
+                    <h1 style='
+                        text-align:center;
+                        color:#facc15;
+                    '>
+                        {abiertos}
+                    </h1>
 
-<p style='text-align:center;color:white'>
-Condiciones Abiertas
-</p>
+                    <p style='
+                        text-align:center;
+                        color:white;
+                    '>
+                        Condiciones Abiertas
+                    </p>
 
-<hr>
+                    <hr style='border-color:#4b5563;'>
 
-<p style='color:#ef4444'>
-🔴 Abiertas: <b>{abiertos}</b>
-</p>
+                    <p style='color:#facc15'>
+                        🟡 Abiertas: <b>{abiertos}</b>
+                    </p>
 
-<p style='color:#f59e0b'>
-🟡 En Proceso: <b>{en_proceso}</b>
-</p>
+                    <p style='color:#3b82f6'>
+                        🔵 En Proceso: <b>{en_proceso}</b>
+                    </p>
 
-<p style='color:#dc2626'>
-⏰ Atrasadas: <b>{atrasados}</b>
-</p>
+                    <p style='color:#ef4444'>
+                        🔴 Atrasadas: <b>{atrasados}</b>
+                    </p>
 
-<p style='color:#22c55e'>
-🟢 Cerradas: <b>{cerrados}</b>
-</p>
+                    <p style='color:#22c55e'>
+                        🟢 Cerradas: <b>{cerrados}</b>
+                    </p>
 
-<p style='color:white'>
-📈 % Cierre: <b>{porcentaje}%</b>
-</p>
+                    <p style='color:white'>
+                        📈 % Cierre: <b>{porcentaje}%</b>
+                    </p>
 
-</div>
-""",
+                </div>
+                """,
                 unsafe_allow_html=True
             )
 
+            # ==========================================================
+            # BOTÓN
+            # ==========================================================
+
             if st.button(
-                f"📂 Entrar",
-                key=f"area_{i}",
+                "📂 Entrar",
+                key=f"area_{i}_{area}",
                 width="stretch"
             ):
+
                 area_seleccionada = area
 
     return area_seleccionada
